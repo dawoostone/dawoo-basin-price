@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="다우 단가표">
+<title>다우세라믹앤석재 - 세면대 단가 계산기</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Malgun Gothic', '맑은 고딕', -apple-system, sans-serif;
+    background: #f4f5f7; color: #1a1a1a; line-height: 1.5;
+    display: flex; justify-content: center; padding: 24px 16px;
+  }
+  .wrap { width: 100%; max-width: 560px; }
+  .card {
+    background: #fff; border-radius: 14px; padding: 28px;
+    box-shadow: 0 2px 16px rgba(0,0,0,.08);
+  }
+  h1 { font-size: 20px; margin-bottom: 4px; color: #1a1a1a; }
+  .badge {
+    display: inline-block; font-size: 12px; font-weight: 700; color: #fff;
+    background: #d83a3a; border-radius: 5px; padding: 3px 9px; margin-left: 8px;
+    vertical-align: middle; letter-spacing: .3px;
+  }
+  .sub { font-size: 13px; color: #888; margin-bottom: 22px; }
+  label { display: block; font-size: 14px; font-weight: 600; margin: 16px 0 6px; }
+  select {
+    width: 100%; padding: 12px 14px; font-size: 16px; border: 1.5px solid #d8dce0;
+    border-radius: 8px; background: #fff; cursor: pointer;
+    -webkit-appearance: none; -moz-appearance: none; appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23888' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 14px center;
+  }
+  @media (max-width: 480px) {
+    body { padding: 14px 10px; }
+    .card { padding: 20px 16px; }
+    h1 { font-size: 17px; }
+    .badge { display: inline-block; margin: 6px 0 0; }
+    .total .val { font-size: 21px; }
+  }
+  select:focus { outline: none; border-color: #2c6cf0; }
+  .hidden { display: none; }
+  .result {
+    margin-top: 26px; border-radius: 10px; overflow: hidden;
+    border: 1.5px solid #e4e7eb;
+  }
+  .row { display: flex; justify-content: space-between; padding: 11px 16px; font-size: 14px; }
+  .row:nth-child(odd) { background: #fafbfc; }
+  .row .lbl { color: #555; }
+  .row .val { font-weight: 600; }
+  .total {
+    background: #1a2540; color: #fff; padding: 18px 16px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .total .lbl { font-size: 15px; }
+  .total .val { font-size: 24px; font-weight: 700; }
+  .info {
+    margin-top: 14px; font-size: 12.5px; color: #555; background: #f0f4ff;
+    border: 1px solid #d3def7; border-radius: 8px; padding: 12px 14px; display: none;
+  }
+  .info.show { display: block; }
+  .note {
+    margin-top: 14px; font-size: 12.5px; color: #8a6d00; background: #fff8e1;
+    border: 1px solid #ffe69b; border-radius: 8px; padding: 12px 14px; display: none;
+  }
+  .note.show { display: block; }
+  .terms {
+    margin-top: 16px; font-size: 12px; color: #777; border-top: 1px dashed #ddd; padding-top: 14px;
+  }
+  .terms b { color: #555; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>MONO-LITH BASIN 단가 계산기<span class="badge">외부 노출 금지</span></h1>
+    <div class="sub">㈜ 다우세라믹앤석재</div>
+
+    <label for="cat">제품 종류</label>
+    <select id="cat">
+      <option value="mono">모놀리스 (주문제작 · 사이즈별)</option>
+      <option value="std">규격 사이즈 (600*470*200)</option>
+      <option value="round">라운드형</option>
+    </select>
+
+    <!-- 모놀리스 전용 입력 -->
+    <div id="grpMono">
+      <label for="size">사이즈 (MM)</label>
+      <select id="size">
+        <option value="0">800*550*180 (800 이하 동일)</option>
+        <option value="1">900*550*180</option>
+        <option value="2">1000*550*180</option>
+        <option value="3">1100*550*180</option>
+        <option value="4">1200*550*180</option>
+        <option value="5">1300*550*180</option>
+        <option value="6">1400*550*180</option>
+        <option value="7">1500*550*180</option>
+        <option value="8">1600*550*180</option>
+        <option value="9">1700*550*180</option>
+        <option value="10">1800*550*180</option>
+        <option value="11">1900*550*180</option>
+        <option value="12">2000 이상 (별도 견적)</option>
+      </select>
+
+      <label for="mat">자재</label>
+      <select id="mat">
+        <option value="base">15티 열성형 자재</option>
+        <option value="front">팬텀 화이트</option>
+        <option value="back">아스펜라이트그레이</option>
+        <option value="back">알래스카</option>
+      </select>
+
+      <label for="skirt">치마 높이 (기타 옵션)</label>
+      <select id="skirt">
+        <option value="-30000">상판만 (치마 없음, -3만)</option>
+        <option value="0" selected>치마 높이 180MM (기본)</option>
+        <option value="30000">200~250 (기본 3만)</option>
+        <option value="60000">251~300 (기본 6만)</option>
+        <option value="90000">301~350 (기본 9만)</option>
+        <option value="120000">351~400 (기본 12만)</option>
+        <option value="150000">401~450 (기본 15만)</option>
+        <option value="180000">451~500 (기본 18만)</option>
+      </select>
+
+      <label for="ball">볼 성형</label>
+      <select id="ball">
+        <option value="0">1볼 (기본)</option>
+        <option value="150000">2볼 (+15만)</option>
+      </select>
+    </div>
+
+    <!-- 규격 사이즈 전용 -->
+    <div id="grpStd" class="hidden">
+      <label for="stdProd">제품</label>
+      <select id="stdProd">
+        <option value="0">팬텀 아이보리</option>
+        <option value="1">키프로스 라이트 그레이</option>
+        <option value="2">화이트 트라버티노</option>
+      </select>
+    </div>
+
+    <!-- 라운드형 전용 -->
+    <div id="grpRound" class="hidden">
+      <label for="roundSize">사이즈 (MM)</label>
+      <select id="roundSize">
+        <option value="0">600*470*150</option>
+        <option value="1">800*470*150</option>
+      </select>
+    </div>
+
+    <label for="biz">업체 유형</label>
+    <select id="biz">
+      <option value="dist">유통 업체</option>
+      <option value="interior">인테리어 업체</option>
+      <option value="consumer">소비자</option>
+    </select>
+
+    <div class="result" id="result">
+      <div class="row m-row"><span class="lbl">기본 단가</span><span class="val" id="rBase">-</span></div>
+      <div class="row m-row"><span class="lbl">업체 마진</span><span class="val" id="rBiz">-</span></div>
+      <div class="row m-row"><span class="lbl">자재 추가</span><span class="val" id="rMat">-</span></div>
+      <div class="row m-row"><span class="lbl">치마 추가</span><span class="val" id="rSkirt">-</span></div>
+      <div class="row m-row"><span class="lbl">볼 성형 추가</span><span class="val" id="rBall">-</span></div>
+      <div class="total"><span class="lbl" id="rTotalLbl">최종 단가</span><span class="val" id="rTotal">-</span></div>
+    </div>
+
+    <div class="info" id="info"></div>
+    <div class="note" id="note"></div>
+
+    <div class="terms">
+      <b style="color:#d83a3a;">※ 안내사항 (필독)</b><br>
+      · 브라켓 1SET 포함<br>
+      · 국내 재고 규정 사이즈에 한하며, 주문 제작 단가는 별도 안내<br>
+      · 폽업 · 수전 별도 구매<br>
+      · 부가세 별도<br>
+      · 운송비 · 시공비 미포함<br>
+      · 모놀리스 추가 가공비(뎁스 · 볼 · 치마 등)는 위 옵션 외 별도 계산
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== 데이터 ===== */
+// 모놀리스(주문제작) 도매 시트 기준: [라벨, 기본단가, 엑스트라 앞금액, 엑스트라 뒷금액, 상판폭(mm)]
+const SIZES = [
+  ["800*550*180 (800 이하 동일)", 380000, 50000, 80000, 800],
+  ["900*550*180",  400000, 50000, 80000, 900],
+  ["1000*550*180", 420000, 50000, 80000, 1000],
+  ["1100*550*180", 440000, 60000, 100000, 1100],
+  ["1200*550*180", 470000, 60000, 100000, 1200],
+  ["1300*550*180", 500000, 60000, 100000, 1300],
+  ["1400*550*180", 540000, 70000, 110000, 1400],
+  ["1500*550*180", 580000, 70000, 110000, 1500],
+  ["1600*550*180", 620000, 90000, 130000, 1600],
+  ["1700*550*180", 670000, 90000, 130000, 1700],
+  ["1800*550*180", 720000, 90000, 130000, 1800],
+  ["1900*550*180", 770000, 100000, 140000, 1900],
+  ["2000 이상 (별도 견적)", null, null, null, 2000]
+];
+
+// 모놀리스 업체 마진
+const MONO_MARKUP = { dist: 60000, interior: 240000, consumer: 440000 };
+
+// 규격 사이즈 제품: [제품명, 두께, 마감, 재고, [유통, 인테리어, 소비자]]
+const STD = [
+  ["팬텀 아이보리",          12, "몰드 매트", "12티/6티 상시 재고", [420000, 540000, 680000]],
+  ["키프로스 라이트 그레이", 12, "몰드 매트", "12티/6티 상시 재고", [420000, 540000, 680000]],
+  ["화이트 트라버티노",      15, "매트",      "국내 재고 없음",      [360000, 460000, 580000]]
+];
+const STD_SIZE = "600*470*200";
+
+// 라운드형: [사이즈, [유통, 인테리어, 소비자]]
+const ROUND = [
+  ["600*470*150", [400000, 450000, 550000]],
+  ["800*470*150", [480000, 550000, 650000]]
+];
+
+const BIZ_IDX = { dist: 0, interior: 1, consumer: 2 };
+
+/* ===== 공통 ===== */
+const won = n => n.toLocaleString('ko-KR') + "원";
+const signed = v => v === 0 ? "+ 0원" : (v > 0 ? "+ " : "- ") + won(Math.abs(v));
+const $ = id => document.getElementById(id);
+
+// 옵션은 HTML에 직접 작성됨 (모바일 호환). JS는 인덱스로 데이터만 참조
+const sizeSel = $('size'), stdSel = $('stdProd'), roundSel = $('roundSize');
+
+const catSel = $('cat'), bizSel = $('biz'), matSel = $('mat'),
+      skirtSel = $('skirt'), ballSel = $('ball'),
+      note = $('note'), info = $('info');
+
+function showMonoRows(show) {
+  document.querySelectorAll('.m-row').forEach(r => r.style.display = show ? '' : 'none');
+}
+
+function calc() {
+  const cat = catSel.value;
+  const biz = bizSel.value;
+  note.className = "note";
+  info.className = "info";
+
+  // 그룹 표시 전환
+  $('grpMono').className  = cat === 'mono'  ? '' : 'hidden';
+  $('grpStd').className   = cat === 'std'   ? '' : 'hidden';
+  $('grpRound').className = cat === 'round' ? '' : 'hidden';
+
+  /* --- 규격 사이즈 --- */
+  if (cat === 'std') {
+    showMonoRows(false);
+    const p = STD[+stdSel.value];
+    const price = p[4][BIZ_IDX[biz]];
+    $('rTotalLbl').textContent = "판매 단가";
+    $('rTotal').textContent = won(price);
+    info.className = "info show";
+    info.innerHTML = "사이즈 " + STD_SIZE + " · 두께 " + p[1] + "T · 마감 " + p[2] + "<br>재고: " + p[3];
+    return;
+  }
+
+  /* --- 라운드형 --- */
+  if (cat === 'round') {
+    showMonoRows(false);
+    const r = ROUND[+roundSel.value];
+    const price = r[1][BIZ_IDX[biz]];
+    $('rTotalLbl').textContent = "판매 단가";
+    $('rTotal').textContent = won(price);
+    info.className = "info show";
+    info.innerHTML = "라운드형 · 사이즈 " + r[0];
+    return;
+  }
+
+  /* --- 모놀리스 (주문제작) --- */
+  showMonoRows(true);
+  $('rTotalLbl').textContent = "최종 단가";
+  const s = SIZES[+sizeSel.value];
+  const base = s[1], front = s[2], back = s[3], width = s[4];
+
+  if (base === null) {
+    ['rBase','rBiz','rMat','rSkirt','rBall'].forEach(id => $(id).textContent = "-");
+    $('rTotal').textContent = "별도 견적";
+    note.className = "note show";
+    note.textContent = "⚠ 2000MM 이상은 길이에 따라 단가가 달라지고 핸들링 차지가 발생합니다. 별도 견적이 필요합니다.";
+    return;
+  }
+
+  const bizAdd = MONO_MARKUP[biz];
+
+  // 자재: 기본=0, 팬텀화이트=앞금액, 그 외=뒷금액
+  let matAdd = 0;
+  if (matSel.value === 'front') matAdd = front;
+  else if (matSel.value === 'back') matAdd = back;
+
+  // 치마: 구간 기본금액 + 상판 1m 초과 시 같은 금액씩 가감 (상판만 = 차감)
+  const skirtBase = +skirtSel.value;
+  const extraMeters = Math.max(0, Math.ceil(width / 1000) - 1);
+  const skirtAdd = skirtBase === 0 ? 0 : skirtBase * (1 + extraMeters);
+
+  const ballAdd = +ballSel.value;
+  const total = base + bizAdd + matAdd + skirtAdd + ballAdd;
+
+  $('rBase').textContent = won(base);
+  $('rBiz').textContent = "+ " + won(bizAdd);
+  $('rMat').textContent = signed(matAdd);
+  $('rSkirt').textContent = signed(skirtAdd)
+      + (extraMeters > 0 && skirtBase !== 0 ? " (1m초과 " + (skirtBase > 0 ? "+" : "-") + won(Math.abs(skirtBase)) + ")" : "");
+  $('rBall').textContent = signed(ballAdd);
+  $('rTotal').textContent = won(total);
+}
+
+[catSel, sizeSel, stdSel, roundSel, bizSel, matSel, skirtSel, ballSel]
+  .forEach(el => el.addEventListener('change', calc));
+calc();
+</script>
+</body>
+</html>
