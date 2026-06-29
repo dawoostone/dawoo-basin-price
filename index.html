@@ -284,6 +284,16 @@ function calc() {
     return;
   }
 
+  // 12티 자재(팬텀 화이트·아스펜라이트그레이·알래스카)는 1600mm 이상 제작 불가
+  if (matSel.value !== 'base' && width >= 1600) {
+    $('rBase').textContent = won(base);
+    ['rBiz','rMat','rSkirt','rBall'].forEach(id => $(id).textContent = "-");
+    $('rTotal').textContent = "제작 불가";
+    note.className = "note show";
+    note.textContent = "⚠ 선택하신 자재(팬텀 화이트·아스펜라이트그레이·알래스카, 12티)는 1600mm 이상 제작이 불가합니다. 기본 자재(15티 열성형)를 선택하거나 사이즈를 줄여 주세요.";
+    return;
+  }
+
   const bizAdd = MONO_MARKUP[biz];
 
   // 자재: 기본=0, 팬텀화이트=앞금액, 그 외=뒷금액
