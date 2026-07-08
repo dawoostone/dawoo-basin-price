@@ -9,15 +9,12 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    font-family: 'Malgun Gothic', '맑은 고딕', -apple-system, sans-serif;
+    font-family: 'Pretendard', 'Malgun Gothic', '맑은 고딕', -apple-system, sans-serif;
     background: #f4f5f7; color: #1a1a1a; line-height: 1.5;
     display: flex; justify-content: center; padding: 24px 16px;
   }
   .wrap { width: 100%; max-width: 560px; }
-  .card {
-    background: #fff; border-radius: 14px; padding: 28px;
-    box-shadow: 0 2px 16px rgba(0,0,0,.08);
-  }
+  .card { background: #fff; border-radius: 14px; padding: 28px; box-shadow: 0 2px 16px rgba(0,0,0,.08); }
   h1 { font-size: 20px; margin-bottom: 4px; color: #1a1a1a; }
   .badge {
     display: inline-block; font-size: 12px; font-weight: 700; color: #fff;
@@ -42,33 +39,19 @@
   }
   select:focus { outline: none; border-color: #2c6cf0; }
   .hidden { display: none; }
-  .result {
-    margin-top: 26px; border-radius: 10px; overflow: hidden;
-    border: 1.5px solid #e4e7eb;
-  }
+  .result { margin-top: 26px; border-radius: 10px; overflow: hidden; border: 1.5px solid #e4e7eb; }
   .row { display: flex; justify-content: space-between; padding: 11px 16px; font-size: 14px; }
   .row:nth-child(odd) { background: #fafbfc; }
   .row .lbl { color: #555; }
   .row .val { font-weight: 600; }
-  .total {
-    background: #1a2540; color: #fff; padding: 18px 16px;
-    display: flex; justify-content: space-between; align-items: center;
-  }
+  .total { background: #1a2540; color: #fff; padding: 18px 16px; display: flex; justify-content: space-between; align-items: center; }
   .total .lbl { font-size: 15px; }
   .total .val { font-size: 24px; font-weight: 700; }
-  .info {
-    margin-top: 14px; font-size: 12.5px; color: #555; background: #f0f4ff;
-    border: 1px solid #d3def7; border-radius: 8px; padding: 12px 14px; display: none;
-  }
+  .info { margin-top: 14px; font-size: 12.5px; color: #555; background: #f0f4ff; border: 1px solid #d3def7; border-radius: 8px; padding: 12px 14px; display: none; }
   .info.show { display: block; }
-  .note {
-    margin-top: 14px; font-size: 12.5px; color: #8a6d00; background: #fff8e1;
-    border: 1px solid #ffe69b; border-radius: 8px; padding: 12px 14px; display: none;
-  }
+  .note { margin-top: 14px; font-size: 12.5px; color: #8a6d00; background: #fff8e1; border: 1px solid #ffe69b; border-radius: 8px; padding: 12px 14px; display: none; }
   .note.show { display: block; }
-  .terms {
-    margin-top: 16px; font-size: 12px; color: #777; border-top: 1px dashed #ddd; padding-top: 14px;
-  }
+  .terms { margin-top: 16px; font-size: 12px; color: #777; border-top: 1px dashed #ddd; padding-top: 14px; }
   .terms b { color: #555; }
 </style>
 </head>
@@ -81,6 +64,7 @@
     <label for="cat">제품 종류</label>
     <select id="cat">
       <option value="mono">모놀리스 (주문제작 · 사이즈별)</option>
+      <option value="natl">국내제작 (조건별)</option>
       <option value="std">규격 사이즈 (600*470*200)</option>
       <option value="round">라운드형</option>
     </select>
@@ -131,6 +115,16 @@
       </select>
     </div>
 
+    <!-- 국내제작 전용 -->
+    <div id="grpNatl" class="hidden">
+      <label for="natlOpt">제작 조건</label>
+      <select id="natlOpt">
+        <option value="0">1200 상판 즉시 출고 (사이즈 수정 없음)</option>
+        <option value="1">1200 이하 주문 발주</option>
+        <option value="2">1200 이하 · 치마 200 이하 주문</option>
+      </select>
+    </div>
+
     <!-- 규격 사이즈 전용 -->
     <div id="grpStd" class="hidden">
       <label for="stdProd">제품</label>
@@ -176,6 +170,7 @@
       · 폽업 · 수전 별도 구매<br>
       · 부가세 별도<br>
       · 운송비 · 시공비 미포함<br>
+      · 팬텀 화이트 · 아스펜라이트그레이 · 알래스카(12티)는 1600mm 이상 제작 불가<br>
       · 모놀리스 추가 가공비(뎁스 · 볼 · 치마 등)는 위 옵션 외 별도 계산
     </div>
   </div>
@@ -183,7 +178,6 @@
 
 <script>
 /* ===== 데이터 ===== */
-// 모놀리스(주문제작) 도매 시트 기준: [라벨, 기본단가, 엑스트라 앞금액, 엑스트라 뒷금액, 상판폭(mm)]
 const SIZES = [
   ["800*550*180 (800 이하 동일)", 380000, 50000, 80000, 800],
   ["900*550*180",  400000, 50000, 80000, 900],
@@ -199,11 +193,15 @@ const SIZES = [
   ["1900*550*180", 770000, 100000, 140000, 1900],
   ["2000 이상 (별도 견적)", null, null, null, 2000]
 ];
-
-// 모놀리스 업체 마진
 const MONO_MARKUP = { dist: 60000, interior: 240000, consumer: 440000 };
 
-// 규격 사이즈 제품: [제품명, 두께, 마감, 재고, [유통, 인테리어, 소비자]]
+// 국내제작 (조건별): [조건명, [유통, 인테리어, 소비자]]
+const NATL = [
+  ["1200 상판 즉시 출고 (사이즈 수정 없음)", [300000, 400000, 600000]],
+  ["1200 이하 주문 발주",                   [500000, 600000, 660000]],
+  ["1200 이하 · 치마 200 이하 주문",         [800000, 900000, 1100000]]
+];
+
 const STD = [
   ["팬텀 아이보리",          12, "몰드 매트", "12티/6티 상시 재고", [420000, 540000, 680000]],
   ["키프로스 라이트 그레이", 12, "몰드 매트", "12티/6티 상시 재고", [420000, 540000, 680000]],
@@ -211,7 +209,6 @@ const STD = [
 ];
 const STD_SIZE = "600*470*200";
 
-// 라운드형: [사이즈, [유통, 인테리어, 소비자]]
 const ROUND = [
   ["600*470*150", [400000, 450000, 550000]],
   ["800*470*150", [480000, 550000, 650000]]
@@ -224,9 +221,7 @@ const won = n => n.toLocaleString('ko-KR') + "원";
 const signed = v => v === 0 ? "+ 0원" : (v > 0 ? "+ " : "- ") + won(Math.abs(v));
 const $ = id => document.getElementById(id);
 
-// 옵션은 HTML에 직접 작성됨 (모바일 호환). JS는 인덱스로 데이터만 참조
-const sizeSel = $('size'), stdSel = $('stdProd'), roundSel = $('roundSize');
-
+const sizeSel = $('size'), stdSel = $('stdProd'), roundSel = $('roundSize'), natlSel = $('natlOpt');
 const catSel = $('cat'), bizSel = $('biz'), matSel = $('mat'),
       skirtSel = $('skirt'), ballSel = $('ball'),
       note = $('note'), info = $('info');
@@ -241,10 +236,22 @@ function calc() {
   note.className = "note";
   info.className = "info";
 
-  // 그룹 표시 전환
   $('grpMono').className  = cat === 'mono'  ? '' : 'hidden';
+  $('grpNatl').className  = cat === 'natl'  ? '' : 'hidden';
   $('grpStd').className   = cat === 'std'   ? '' : 'hidden';
   $('grpRound').className = cat === 'round' ? '' : 'hidden';
+
+  /* --- 국내제작 --- */
+  if (cat === 'natl') {
+    showMonoRows(false);
+    const n = NATL[+natlSel.value];
+    const price = n[1][BIZ_IDX[biz]];
+    $('rTotalLbl').textContent = "판매 단가";
+    $('rTotal').textContent = won(price);
+    info.className = "info show";
+    info.innerHTML = "국내제작 · " + n[0];
+    return;
+  }
 
   /* --- 규격 사이즈 --- */
   if (cat === 'std') {
@@ -296,12 +303,10 @@ function calc() {
 
   const bizAdd = MONO_MARKUP[biz];
 
-  // 자재: 기본=0, 팬텀화이트=앞금액, 그 외=뒷금액
   let matAdd = 0;
   if (matSel.value === 'front') matAdd = front;
   else if (matSel.value === 'back') matAdd = back;
 
-  // 치마: 구간 기본금액 + 상판 1m 초과 시 같은 금액씩 가감 (상판만 = 차감)
   const skirtBase = +skirtSel.value;
   const extraMeters = Math.max(0, Math.ceil(width / 1000) - 1);
   const skirtAdd = skirtBase === 0 ? 0 : skirtBase * (1 + extraMeters);
@@ -318,7 +323,7 @@ function calc() {
   $('rTotal').textContent = won(total);
 }
 
-[catSel, sizeSel, stdSel, roundSel, bizSel, matSel, skirtSel, ballSel]
+[catSel, sizeSel, stdSel, roundSel, natlSel, bizSel, matSel, skirtSel, ballSel]
   .forEach(el => el.addEventListener('change', calc));
 calc();
 </script>
