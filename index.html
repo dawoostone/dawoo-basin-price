@@ -85,7 +85,10 @@
         <option value="9">1700*550*180</option>
         <option value="10">1800*550*180</option>
         <option value="11">1900*550*180</option>
-        <option value="12">2000 이상 (별도 견적)</option>
+        <option value="12">2000*550*180</option>
+          <option value="13">2100*550*180</option>
+          <option value="14">2200*550*180</option>
+          <option value="15">2200 초과 (별도 견적)</option>
       </select>
 
       <label for="mat">자재</label>
@@ -170,7 +173,7 @@
       · 폽업 · 수전 별도 구매<br>
       · 부가세 별도<br>
       · 운송비 · 시공비 미포함<br>
-      · 팬텀 화이트 · 아스펜라이트그레이 · 알래스카(12티)는 1600mm 이상 제작 불가<br>
+      · 아스펜라이트그레이 · 알래스카(12티)는 1600mm 이상 제작 불가 (팬텀 화이트는 2200mm까지 가능)<br>
       · 모놀리스 추가 가공비(뎁스 · 볼 · 치마 등)는 위 옵션 외 별도 계산
     </div>
   </div>
@@ -191,7 +194,10 @@ const SIZES = [
   ["1700*550*180", 670000, 90000, 130000, 1700],
   ["1800*550*180", 720000, 90000, 130000, 1800],
   ["1900*550*180", 770000, 100000, 140000, 1900],
-  ["2000 이상 (별도 견적)", null, null, null, 2000]
+  ["2000*550*180", 860000, 100000, 140000, 2000],
+  ["2100*550*180", 950000, 100000, 140000, 2100],
+  ["2200*550*180", 1040000, 110000, 150000, 2200],
+  ["2200 초과 (별도 견적)", null, null, null, 2300]
 ];
 const MONO_MARKUP = { dist: 60000, interior: 240000, consumer: 440000 };
 
@@ -287,17 +293,17 @@ function calc() {
     ['rBase','rBiz','rMat','rSkirt','rBall'].forEach(id => $(id).textContent = "-");
     $('rTotal').textContent = "별도 견적";
     note.className = "note show";
-    note.textContent = "⚠ 2000MM 이상은 길이에 따라 단가가 달라지고 핸들링 차지가 발생합니다. 별도 견적이 필요합니다.";
+    note.textContent = "⚠ 2200MM 초과는 길이에 따라 단가가 달라지고 핸들링 차지가 발생합니다. 별도 견적이 필요합니다.";
     return;
   }
 
-  // 12티 자재(팬텀 화이트·아스펜라이트그레이·알래스카)는 1600mm 이상 제작 불가
-  if (matSel.value !== 'base' && width >= 1600) {
+  // 12티 자재(아스펜라이트그레이·알래스카)는 1600mm 이상 제작 불가 — 팬텀 화이트는 2026-10-29부터 2200mm까지 가능
+  if (matSel.value === 'back' && width >= 1600) {
     $('rBase').textContent = won(base);
     ['rBiz','rMat','rSkirt','rBall'].forEach(id => $(id).textContent = "-");
     $('rTotal').textContent = "제작 불가";
     note.className = "note show";
-    note.textContent = "⚠ 선택하신 자재(팬텀 화이트·아스펜라이트그레이·알래스카, 12티)는 1600mm 이상 제작이 불가합니다. 기본 자재(15티 열성형)를 선택하거나 사이즈를 줄여 주세요.";
+    note.textContent = "⚠ 선택하신 자재(아스펜라이트그레이·알래스카, 12티)는 1600mm 이상 제작이 불가합니다. 기본 자재(15티 열성형)를 선택하거나 사이즈를 줄여 주세요.";
     return;
   }
 
